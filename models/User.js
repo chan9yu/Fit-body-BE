@@ -2,11 +2,12 @@ const { Schema, model } = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const moment = require("moment");
 
 const userSchema = Schema({
 	name: { type: String, maxlength: 50 },
 	email: { type: String, trim: true, unique: 1 },
-	password: { type: String, minlength: 5 },
+	password: { type: String, minlength: 4 },
 	lastname: { type: String, maxlength: 50 },
 	role: { type: Number, default: 0 }, // 관리자 여부
 	image: { type: String },
@@ -46,7 +47,9 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
 userSchema.methods.generateToken = function (cb) {
 	const user = this
 	const token = jwt.sign(user._id.toHexString(), 'secretToken')
+	const twoHour = moment().add(2, 'hour').valueOf();
 	user.token = token
+	user.tokenExp = twoHour
 	user.save(function (err, user) {
 		if (err) return cb(err)
 		cb(null, user)
@@ -56,9 +59,8 @@ userSchema.methods.generateToken = function (cb) {
 userSchema.statics.findByToken = function (token, cb) {
 	const user = this
 	// token decode
-	jwt.verify(token, 'secretToken', function (err, decoded) {
-    // token이 일치하는지 확인
-		user.findOne({ _id: decoded, token }, function (err, user) {
+	jwt.verify(token, 'secretToken', function (err, decode) {
+		user.findOne({ "_id": decode, "token": token }, (err, user) => {
 			if (err) return cb(err)
 			cb(null, user)
 		})
