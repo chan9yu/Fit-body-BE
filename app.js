@@ -1,27 +1,30 @@
 const express = require('express')
 const cors = require('cors')
-const path = require('path')
 const mongoose = require('mongoose')
 const cookieParser = require('cookie-parser')
 const { mongoURI } = require('./config/key')
+const userRouter = require('./router/user')
+const morgan = require('morgan')
 
 const app = express()
-const port = 5000
-// const origin = 'http://localhost:3000'
+const port = 3000
+const origin = 'http://localhost:8080'
 
-app.use(cors({ origin: true, credentials: true }))
+app.use(morgan('dev'))
+app.use(cors({ origin, credentials: true }))
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use('/uploads', express.static('uploads'))
-// routes
-app.use('/api/users', require('./routes/users'))
 
-mongoose
-	.connect(mongoURI)
-	.then(() => console.log('mongoose 연결 완료!'))
-	.catch(err => console.error(err))
+const server = async () => {
+	try {
+		await mongoose.connect(mongoURI)
+		console.log('mongoose 연결 성공!')
+		app.use('/user', userRouter)
+		app.listen(port, () => console.log(`express 서버 시작 ${port}`))
+	} catch (error) {
+		console.error(error)
+	}
+}
 
-app.get('/', (req, res) => res.send('예아'))
-
-app.listen(port, () => console.log(`express port ${port} 으로 시작!`))
+server()
