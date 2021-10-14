@@ -16,7 +16,7 @@ const upload = multer({
 			done(null, basename + Date.now() + ext)
 		}
 	}),
-  limit: { fileSize: 20 * 1024 * 1024 }
+	limit: { fileSize: 20 * 1024 * 1024 }
 }).single('file')
 
 router.post('/images', (req, res) => {
@@ -25,11 +25,23 @@ router.post('/images', (req, res) => {
 			return req.json({ success: false, err })
 		}
 		return res.json({
-			success: true,
-			filePath: res.req.file.path,
 			fileName: res.req.file.filename
 		})
 	})
+})
+
+// 상품 등록 api
+router.post('/', async (req, res) => {
+	try {
+		const product = await new Product(req.body)
+		product.save(err => {
+			if (err) return res.status(400).json({ success: false, err })
+			return res.status(200).json({ success: true })
+		})
+	} catch (error) {
+		console.error(error)
+		return res.status(500).send({ error })
+	}
 })
 
 module.exports = router
