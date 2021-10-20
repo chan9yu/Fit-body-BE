@@ -21,9 +21,7 @@ const upload = multer({
 
 router.post('/images', (req, res) => {
 	upload(req, res, err => {
-		if (err) {
-			return req.json({ success: false, err })
-		}
+		if (err) res.json({ success: false, err })
 		return res.json({
 			fileName: res.req.file.filename
 		})
