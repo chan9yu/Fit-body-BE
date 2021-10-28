@@ -42,6 +42,7 @@ router.post('/', async (req, res) => {
 	}
 })
 
+// 상품 데이터 보여주기
 router.post('/products', async (req, res) => {
 	// 더보기 기능
 	const skip = req.body.skip ? parseInt(req.body.skip) : 0
