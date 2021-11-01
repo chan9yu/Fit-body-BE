@@ -1,7 +1,7 @@
 import express from 'express'
 import multer from 'multer'
 import path from 'path'
-import { Product } from '../models/Product'
+import { Product } from '../models'
 
 const router = express.Router()
 
@@ -76,6 +76,22 @@ router.get('/:id', async (req, res) => {
 		// 해당 id의 상품 찾기
 		const products = await Product.find({ _id: { $in: id } })
 		return res.status(200).send(products)
+	} catch (error) {
+		console.error(error)
+		return res.status(500).send({ error })
+	}
+})
+
+// 상세 페이지에서 해당 카테고리 상품 보여주기 (최대 4개만 보내주기)
+router.post('/with', async (req, res) => {
+	try {
+		const { categorys } = req.body
+		if (!categorys)
+			return res.status(400).json({ message: '잘못된 요청입니다.' })
+		const totalProducts = await Product.find({ categorys })
+		console.log(totalProducts)
+		const products = await Product.find({ categorys }).limit(4)
+		return res.status(200).json({ products })
 	} catch (error) {
 		console.error(error)
 		return res.status(500).send({ error })
