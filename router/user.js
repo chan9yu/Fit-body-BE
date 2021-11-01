@@ -1,6 +1,6 @@
-const express = require('express')
-const { User } = require('../models/User')
-const { auth } = require('../middleware/auth')
+import express from 'express'
+import { User } from '../models/User'
+import { auth } from '../middleware/auth'
 
 const router = express.Router()
 
@@ -95,4 +95,4 @@ router.get('/', auth, (req, res) => {
 	})
 })
 
-module.exports = router
+export default router

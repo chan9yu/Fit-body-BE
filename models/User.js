@@ -1,6 +1,6 @@
-const { Schema, model } = require('mongoose')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
+import { Schema, model } from 'mongoose'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 const saltRounds = 10
 
 const userSchema = new Schema({
@@ -70,6 +70,4 @@ userSchema.statics.findByToken = function (token, cb) {
 	})
 }
 
-const User = model('User', userSchema)
-
-module.exports = { User }
+export const User = model('User', userSchema)

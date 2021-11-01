@@ -1,7 +1,7 @@
-const express = require('express')
-const multer = require('multer')
-const path = require('path')
-const { Product } = require('../models/Product')
+import express from 'express'
+import multer from 'multer'
+import path from 'path'
+import { Product } from '../models/Product'
 
 const router = express.Router()
 
@@ -49,8 +49,6 @@ router.post('/products', async (req, res) => {
 	const limit = req.body.limit ? parseInt(req.body.limit) : 20
 	// 카테고리 분류 기능 구현
 	const { categorys, subCategorys } = req.body
-	console.log(categorys)
-	console.log(subCategorys)
 	try {
 		const products = await Product.find(categorys ? { categorys } : undefined)
 			.find(subCategorys ? { subCategorys } : undefined)
@@ -84,4 +82,4 @@ router.get('/:id', async (req, res) => {
 	}
 })
 
-module.exports = router
+export default router

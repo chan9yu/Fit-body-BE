@@ -1,11 +1,11 @@
-const express = require('express')
-const cors = require('cors')
-const mongoose = require('mongoose')
-const cookieParser = require('cookie-parser')
-const morgan = require('morgan')
-const { mongoURI } = require('./config/key')
-const userRouter = require('./router/user')
-const productRouter = require('./router/product')
+import express from 'express'
+import cors from 'cors'
+import mongoose from 'mongoose'
+import cookieParser from 'cookie-parser'
+import morgan from 'morgan'
+import mongoURI from './config/key'
+import userRouter from './router/user'
+import productRouter from './router/product'
 
 const app = express()
 const port = 3000
