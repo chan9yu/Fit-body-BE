@@ -29,8 +29,9 @@ router.post('/signup', async (req, res) => {
 			})
 		})
 	} catch (error) {
-		console.error(error)
-		return res.status(500).send({ error })
+		const { message } = error
+		console.error(message)
+		return res.status(500).json({ message })
 	}
 })
 
@@ -61,8 +62,9 @@ router.post('/login', async (req, res) => {
 			})
 		})
 	} catch (error) {
-		console.error(error)
-		return res.status(500).send({ error })
+		const { message } = error
+		console.error(message)
+		return res.status(500).json({ message })
 	}
 })
 
@@ -74,8 +76,9 @@ router.get('/logout', auth, async (req, res) => {
 		await User.findOneAndUpdate({ _id }, { token: '' })
 		return res.status(200).send({ success: true })
 	} catch (error) {
-		console.error(error)
-		return res.status(500).send({ error })
+		const { message } = error
+		console.error(message)
+		return res.status(500).json({ message })
 	}
 })
 

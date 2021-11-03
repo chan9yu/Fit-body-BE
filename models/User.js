@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-const saltRounds = 10
 
 const userSchema = new Schema({
 	name: { type: String, maxlength: 50 },
@@ -10,7 +9,6 @@ const userSchema = new Schema({
 	role: { type: Number, default: 0 },
 	cart: { type: Array, default: [] },
 	history: { type: Array, default: [] },
-	image: { type: String },
 	token: { type: String },
 	tokenExp: { type: Number }
 })
@@ -21,7 +19,7 @@ userSchema.pre('save', function (next) {
 	// 유저정보중 password만 변환될때만
 	if (user.isModified('password')) {
 		// salt를 이용해서 암호화 진행
-		bcrypt.genSalt(saltRounds, function (err, salt) {
+		bcrypt.genSalt(10, function (err, salt) {
 			if (err) return next(err) // 에러 처리
 			// hash(암호화할 비밀번호, salt) 만들기
 			bcrypt.hash(user.password, salt, function (err, hash) {
