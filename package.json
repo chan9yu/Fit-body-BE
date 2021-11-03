@@ -4,8 +4,16 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "prepare": "husky install",
     "dev": "npx nodemon --exec babel-node app.js"
   },
+  "lint-staged": {
+		"**/*.js": [
+			"eslint --fix",
+			"prettier --write",
+			"git add"
+		]
+	},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -19,6 +27,8 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-node": "^11.1.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.14",
     "prettier": "^2.4.1"
