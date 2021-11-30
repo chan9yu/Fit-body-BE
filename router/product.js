@@ -1,10 +1,12 @@
 import express from 'express'
 import multer from 'multer'
 import path from 'path'
+import { isLoggedIn } from '../middleware/auth'
 import { Product } from '../models/Product'
 
 const router = express.Router()
 
+// multer setting
 const upload = multer({
 	storage: multer.diskStorage({
 		destination(req, file, done) {
@@ -19,6 +21,8 @@ const upload = multer({
 	limit: { fileSize: 20 * 1024 * 1024 }
 }).single('file')
 
+// POST /product/images
+// 이미지 업로드 API
 router.post('/images', (req, res) => {
 	upload(req, res, err => {
 		if (err) res.json({ success: false, err })
@@ -28,27 +32,36 @@ router.post('/images', (req, res) => {
 	})
 })
 
-// 상품 등록 api
-router.post('/', async (req, res) => {
+// POST /product
+// 상품 등록 API
+router.post('/', isLoggedIn, async (req, res) => {
 	try {
-		const product = await new Product(req.body)
-		product.save(err => {
-			if (err) return res.status(400).json({ success: false, err })
-			return res.status(200).json({ success: true })
-		})
+		const { images, title, description, price, categorys, subCategorys } =
+			req.body
+		if (
+			!images ||
+			!title ||
+			!description ||
+			!price ||
+			!categorys ||
+			!subCategorys
+		) {
+			return res.status(400).json({ message: '빈 값이 있으면 안됩니다.' })
+		}
+		const product = await Product.create(req.body)
+		await product.save()
+		return res.status(200).json({ message: '상품을 등록했습니다.' })
 	} catch (error) {
-		const { message } = error
-		console.error(message)
-		return res.status(500).json({ message })
+		console.error(error.message)
+		return res.status(500).json(error)
 	}
 })
 
-// 상품 데이터 보여주기
+// POST /product/products
+// 상품 정보 API
 router.post('/products', async (req, res) => {
-	// 더보기 기능
 	const skip = req.body.skip ? parseInt(req.body.skip) : 0
 	const limit = req.body.limit ? parseInt(req.body.limit) : 20
-	// 카테고리 분류 기능 구현
 	const { categorys, subCategorys } = req.body
 	try {
 		const products = await Product.find(categorys ? { categorys } : undefined)
@@ -57,44 +70,40 @@ router.post('/products', async (req, res) => {
 			.limit(limit)
 		return res.status(200).json({ products, postSize: products.length })
 	} catch (error) {
-		const { message } = error
-		console.error(message)
-		return res.status(500).json({ message })
+		console.error(error.message)
+		return res.status(500).json(error)
 	}
 })
 
-// 상세 상품 데이터 보여주기
-router.get('/', async (req, res) => {
+// GET /product/productId
+// 상세 상품 정보 API
+router.get('/:productId', async (req, res) => {
 	try {
-		// const { id } = req.params
-		let { id, type } = req.query
-		console.log(id)
-		// type 분기 처리 (카트에 담길 상품들)
+		const { productId } = req.params
+		const { type } = req.query
+		// type 분기  처리
 		if (type === 'array') {
-			let ids = id.split(',')
-			id = ids.map(item => {
-				return item
-			})
+			let ids = productId.split(',')
+			productId = ids.map(item => item)
 		}
 		// 해당 id의 상품 찾기
 		const products = await Product.find({ _id: { $in: id } })
 		return res.status(200).send(products)
 	} catch (error) {
-		const { message } = error
-		console.error(message)
-		return res.status(500).json({ message })
+		console.error(error.message)
+		return res.status(500).json(error)
 	}
 })
 
-// 상세 페이지에서 해당 카테고리 상품 보여주기 (최대 4개만 보내주기)
-router.post('/with', async (req, res) => {
+// POST /product/with
+// 랜덤 4개 상품 정보 API
+router.get('/with', async (req, res) => {
 	try {
 		const products = await Product.aggregate([{ $sample: { size: 4 } }])
 		return res.status(200).json({ products })
 	} catch (error) {
-		const { message } = error
-		console.error(message)
-		return res.status(500).json({ message })
+		console.error(error.message)
+		return res.status(500).json(error)
 	}
 })
 

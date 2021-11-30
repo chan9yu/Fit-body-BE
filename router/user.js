@@ -32,7 +32,7 @@ router.post('/signup', isNotLoggedIn, async (req, res) => {
 			return res.status(400).json({ message: '빈 값이 있으면 안됩니다.' })
 		const exUser = await User.findOne({ email })
 		if (exUser)
-			return res.status(400).json({ meessage: '이미 사용중인 이메일 입니다.' })
+			return res.status(400).json({ message: '이미 사용중인 이메일 입니다.' })
 		if (password.length < 5)
 			return res
 				.status(400)
@@ -40,9 +40,7 @@ router.post('/signup', isNotLoggedIn, async (req, res) => {
 		const hashedPassword = await bcrypt.hash(password, 12)
 		const newUser = await User.create({ email, name, password: hashedPassword })
 		await newUser.save()
-		return res
-			.status(200)
-			.json({ newUser, message: '회원가입에 성공했습니다.' })
+		return res.status(200).json({ message: '회원가입에 성공했습니다.' })
 	} catch (error) {
 		console.error(error.message)
 		return res.status(500).json(error)

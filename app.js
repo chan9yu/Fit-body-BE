@@ -12,7 +12,7 @@ import { MONGO_URI, COOKIE_SECRET } from './config'
 import passportConfig from './passport'
 import userRouter from './router/user'
 import productRouter from './router/product'
-// import cartRouter from './router/cart'
+import cartRouter from './router/cart'
 
 const app = express()
 const port = 3000
@@ -42,7 +42,7 @@ const server = async () => {
 		passportConfig()
 		app.use('/user', userRouter)
 		app.use('/product', productRouter)
-		// app.use('/cart', cartRouter)
+		app.use('/cart', cartRouter)
 		app.listen(port, () => console.log(`express 서버 시작 ${port}`))
 	} catch (error) {
 		console.error(error.message)

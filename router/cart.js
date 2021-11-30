@@ -1,69 +1,79 @@
-// import express from 'express'
-// import { User } from '../models/User'
-// import { auth } from '../middleware/auth'
-// import { Product } from '../models/Product'
+import express from 'express'
+import { User } from '../models/User'
+import { isLoggedIn } from '../middleware/auth'
+import { isValidObjectId } from 'mongoose'
 
-// const router = express.Router()
+const router = express.Router()
 
-// // 카트 아이템 추가 api
-// router.post('/add/:id', auth, async (req, res) => {
-// 	const { id } = req.params
-// 	console.log(req.params)
-// 	try {
-// 		// 해당 유저 정보
-// 		const userInfo = await User.findOne({ _id: req.user._id })
-// 		// 해당 상품이 카트에 이미 있는지 검사
-// 		let overlap = false
-// 		userInfo.cart.forEach(item => {
-// 			if (item.id === id) overlap = true
-// 		})
-// 		// 카트에 이미 상품이 있을 때 갯수를 1 증가
-// 		if (overlap) {
-// 			await User.findOneAndUpdate(
-// 				{ _id: req.user._id, 'cart.id': id },
-// 				{ $inc: { 'cart.$.quantity': 1 } },
-// 				{ new: true }
-// 			)
-// 			return res.status(200).send(userInfo.cart)
-// 		} else {
-// 			await User.findOneAndUpdate(
-// 				{ _id: req.user._id },
-// 				{
-// 					$push: {
-// 						cart: { id, quantity: 1, date: Date.now() }
-// 					}
-// 				},
-// 				{ new: true }
-// 			)
-// 			return res.status(200).send(userInfo.cart)
-// 		}
-// 	} catch (error) {
-// 		const { message } = error
-// 		console.error(message)
-// 		return res.status(500).json({ message })
-// 	}
-// })
+// GET /cart
+// 장바구니 정보 API
+router.get('/', isLoggedIn, async (req, res) => {
+	try {
+		const { id } = req.user
+		const user = await User.findById(id)
+		const { cart } = user
+		return res.status(200).json(cart)
+	} catch (error) {
+		console.error(error.message)
+		return res.status(500).json(error)
+	}
+})
 
-// // 카트 아이템 삭제 api
-// router.get('/remove', auth, async (req, res) => {
-// 	try {
-// 		const { _id } = req.user
-// 		// cart에 해당 상품 제거
-// 		const userInfo = await User.findByIdAndUpdate(
-// 			{ _id },
-// 			{ $pull: { cart: { id: req.query.id } } },
-// 			{ new: true }
-// 		)
-// 		// 제거하고 남아있는 상품들의 정보 가져오기
-// 		const { cart } = userInfo
-// 		const array = cart.map(item => item.id)
-// 		const productInfo = await Product.find({ _id: { $in: array } })
-// 		return res.status(200).json({ productInfo, cart })
-// 	} catch (error) {
-// 		const { message } = error
-// 		console.log(message)
-// 		return res.status(500).json({ message })
-// 	}
-// })
+// PATCH /cart/:productId
+// 장바구니 담기 API
+router.patch('/:productId', isLoggedIn, async (req, res) => {
+	try {
+		const { id } = req.user
+		const { productId } = req.params
+		if (!isValidObjectId(productId))
+			return res.status(400).json({ message: '잘못된 상품 정보입니다.' })
+		const user = await User.findById(id)
+		// 상품 중복 검사
+		let overlap = false
+		user.cart.forEach(item => {
+			if (item.id === productId) overlap = true
+		})
+		// 이미 같은 상품이 있을 때 분기처리
+		if (overlap) {
+			await User.findOneAndUpdate(
+				{ _id: id, 'cart.id': productId },
+				{ $inc: { 'cart.$.count': 1 } },
+				{ new: true }
+			)
+			return res.status(200).send(user.cart)
+		} else {
+			await User.findByIdAndUpdate(
+				id,
+				{ $push: { cart: { id: productId, count: 1, date: Date.now() } } },
+				{ new: true }
+			)
+			return res.status(200).send(user.cart)
+		}
+	} catch (error) {
+		console.error(error.message)
+		return res.status(500).json(error)
+	}
+})
 
-// export default router
+// DELETE /cart/:productId
+// 장바구니 삭제 API
+router.delete('/:productId', isLoggedIn, async (req, res) => {
+	try {
+		const { id } = req.user
+		const { productId } = req.params
+		if (!isValidObjectId(productId))
+			return res.status(400).json({ message: '잘못된 상품 정보입니다.' })
+		// cart에 해당 상품 제거
+		const user = await User.findByIdAndUpdate(
+			id,
+			{ $pull: { cart: { id: productId } } },
+			{ new: true }
+		)
+		return res.status(200).json(user.cart)
+	} catch (error) {
+		console.error(error.message)
+		return res.status(500).json(error)
+	}
+})
+
+export default router
