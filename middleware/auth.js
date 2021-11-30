@@ -1,17 +1,17 @@
-import { User } from '../models/User'
-
-export let auth = (req, res, next) => {
-	// 클라이언트 cookie에서 token을 가져옴
-	let token = req.cookies.auth
-	// token을 복호화
-	User.findByToken(token, (err, user) => {
-		if (err) throw err
-		if (!user)
-			return res
-				.status(400)
-				.json({ isAuth: false, message: '유저가 없습니다.' })
-		req.token = token
-		req.user = user
+export const isLoggedIn = (req, res, next) => {
+	if (req.isAuthenticated()) {
 		next()
-	})
+	} else {
+		return res.status(400).json({ message: '로그인이 필요한 서비스 입니다!' })
+	}
+}
+
+export const isNotLoggedIn = (req, res, next) => {
+	if (!req.isAuthenticated()) {
+		next()
+	} else {
+		return res
+			.status(400)
+			.json({ message: '로그인 하지 않은 사용자만 접근 가능합니다!' })
+	}
 }

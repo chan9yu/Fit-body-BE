@@ -1,101 +1,73 @@
 import express from 'express'
+import bcrypt from 'bcrypt'
+import passport from 'passport'
+
 import { User } from '../models/User'
-import { auth } from '../middleware/auth'
+import { isLoggedIn, isNotLoggedIn } from '../middleware/auth'
 
 const router = express.Router()
 
-// 회원가입 api
-router.post('/signup', async (req, res) => {
+// GET /user
+// 유저정보 API
+router.get('/', async (req, res) => {
 	try {
-		const { email } = req.body
-		// 입력된 정보를 가져옴
-		const user = await new User(req.body)
-		if (req.body.password.length < 5)
-			return res.status(400).json({
-				success: false,
-				message: '비밀번호는 5자리 이상이여야 합니다.'
-			})
-		// 아이디 중복 검사
-		const oldUser = await User.findOne({ email })
-		if (oldUser)
+		if (req.user) {
+			const user = await User.findById(req.user.id)
+			return res.status(200).json(user)
+		} else {
+			return res.status(200).json(null)
+		}
+	} catch (error) {
+		console.error(error.message)
+		return res.status(500).json(error)
+	}
+})
+
+// POST /user/signup
+// 회원가입 API
+router.post('/signup', isNotLoggedIn, async (req, res) => {
+	try {
+		const { name, email, password } = req.body
+		if (!name || !email || !password)
+			return res.status(400).json({ message: '빈 값이 있으면 안됩니다.' })
+		const exUser = await User.findOne({ email })
+		if (exUser)
+			return res.status(400).json({ meessage: '이미 사용중인 이메일 입니다.' })
+		if (password.length < 5)
 			return res
 				.status(400)
-				.json({ success: false, message: '이미 가입된 이메일 입니다.' })
-		// db에 저장
-		user.save((err, userInfo) => {
-			if (err) return res.status(400).json({ success: false, err })
-			return res.status(200).json({
-				success: true
-			})
+				.json({ message: '비밀번호는 5자리 이상이여야 합니다.' })
+		const hashedPassword = await bcrypt.hash(password, 12)
+		const newUser = await User.create({ email, name, password: hashedPassword })
+		await newUser.save()
+		return res
+			.status(200)
+			.json({ newUser, message: '회원가입에 성공했습니다.' })
+	} catch (error) {
+		console.error(error.message)
+		return res.status(500).json(error)
+	}
+})
+
+// POST /user/login
+// 로그인 API
+router.post('/login', isNotLoggedIn, (req, res) => {
+	passport.authenticate('local', (err, user, info) => {
+		if (err) return res.status(500).json({ message: err }) // server error
+		if (info) return res.status(400).json({ message: info }) // client error
+		return req.login(user, loginErr => {
+			if (loginErr) return res.status(500).json(loginErr) // passport error
+			return res.status(200).json(user) // login success
 		})
-	} catch (error) {
-		const { message } = error
-		console.error(message)
-		return res.status(500).json({ message })
-	}
+	})(req, res)
 })
 
-// 로그인 api
-router.post('/login', async (req, res) => {
-	try {
-		const { email, password } = req.body
-		// DB에 이메일 있는지 확인
-		const user = await User.findOne({ email })
-		if (!user)
-			return res.status(400).json({
-				loginSuccess: false,
-				message: '해당 이메일은 존재하지 않습니다.'
-			})
-		// 해당 이메일과 비밀번호가 일치하는지 확인
-		user.comparePassword(password, (err, isMatch) => {
-			if (!isMatch)
-				return res.status(400).json({
-					loginSuccess: false,
-					message: '비밀번호가 틀렸습니다.'
-				})
-			// 로그인 성공 후 토큰 생성
-			user.generateToken((err, user) => {
-				const { token } = user
-				if (err) return res.status(400).send(err)
-				// 토큰을 쿠키에 저장
-				return res.cookie('auth', token).status(200).send(token)
-			})
-		})
-	} catch (error) {
-		const { message } = error
-		console.error(message)
-		return res.status(500).json({ message })
-	}
-})
-
-// 로그아웃 api
-router.get('/logout', auth, async (req, res) => {
-	try {
-		const { _id } = req.user
-		// 해당 아이디의 토큰값 지우기
-		await User.findOneAndUpdate({ _id }, { token: '' })
-		return res.status(200).send({ success: true })
-	} catch (error) {
-		const { message } = error
-		console.error(message)
-		return res.status(500).json({ message })
-	}
-})
-
-// 회원정보 api
-router.get('/', auth, (req, res) => {
-	const { _id, role, email, name, cart, history } = req.user
-	const isAdmin = role === 1 ? true : false
-	res.status(200).json({
-		_id,
-		role,
-		email,
-		name,
-		cart,
-		history,
-		isAdmin,
-		isAuth: true
-	})
+// POST /user/logout
+// 로그아웃 API
+router.get('/logout', isLoggedIn, (req, res) => {
+	req.logout()
+	req.session.destroy()
+	return res.status(200).json({ message: '로그아웃 되었습니다.' })
 })
 
 export default router

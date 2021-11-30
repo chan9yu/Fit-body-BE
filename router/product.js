@@ -64,10 +64,11 @@ router.post('/products', async (req, res) => {
 })
 
 // 상세 상품 데이터 보여주기
-router.get('/:id', async (req, res) => {
+router.get('/', async (req, res) => {
 	try {
-		const { id } = req.params
-		const { type } = req.query
+		// const { id } = req.params
+		let { id, type } = req.query
+		console.log(id)
 		// type 분기 처리 (카트에 담길 상품들)
 		if (type === 'array') {
 			let ids = id.split(',')
