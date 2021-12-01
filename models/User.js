@@ -1,4 +1,4 @@
-import { Schema, model, ObjectId } from 'mongoose'
+import { Schema, model } from 'mongoose'
 
 const userSchema = new Schema({
 	name: { type: String, maxlength: 50, required: true },

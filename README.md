@@ -1,8 +1,8 @@
 # Fit-body-BE
 Fit-body-BE
 
-.env
 ```
+.env
 MONGO_URI="..."
 COOKIE_SECRET="..."
 ```

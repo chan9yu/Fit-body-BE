@@ -1,6 +1,8 @@
 import express from 'express'
+import { isValidObjectId } from 'mongoose'
 import multer from 'multer'
 import path from 'path'
+
 import { isLoggedIn } from '../middleware/auth'
 import { Product } from '../models/Product'
 
@@ -75,32 +77,41 @@ router.post('/products', async (req, res) => {
 	}
 })
 
-// GET /product/productId
-// 상세 상품 정보 API
-router.get('/:productId', async (req, res) => {
+// GET /product/with
+// 랜덤 4개 상품 정보 API
+router.get('/with', async (req, res) => {
 	try {
-		const { productId } = req.params
-		const { type } = req.query
-		// type 분기  처리
-		if (type === 'array') {
-			let ids = productId.split(',')
-			productId = ids.map(item => item)
-		}
-		// 해당 id의 상품 찾기
-		const products = await Product.find({ _id: { $in: id } })
-		return res.status(200).send(products)
+		const products = await Product.aggregate([{ $sample: { size: 4 } }])
+		return res.status(200).json({ products })
 	} catch (error) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
 })
 
-// POST /product/with
-// 랜덤 4개 상품 정보 API
-router.get('/with', async (req, res) => {
+// GET /product/:productId
+// 상세 상품 정보 API
+router.get('/:productId', async (req, res) => {
 	try {
-		const products = await Product.aggregate([{ $sample: { size: 4 } }])
-		return res.status(200).json({ products })
+		let { productId } = req.params
+		const { type } = req.query
+		if (type === 'cart') {
+			const ids = productId.split(',')
+			productId = ids.map(item => item)
+		}
+		// 해당 id의 상품 찾기
+		const products = await Product.find(
+			{ _id: { $in: productId } },
+			{
+				categorys: 1,
+				description: 1,
+				images: 1,
+				price: 1,
+				title: 1,
+				subCategorys: 1
+			}
+		).sort({ _id: -1 })
+		return res.status(200).send(products)
 	} catch (error) {
 		console.error(error.message)
 		return res.status(500).json(error)
