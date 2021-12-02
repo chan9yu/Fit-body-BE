@@ -95,7 +95,7 @@ router.get('/:productId', async (req, res) => {
 	try {
 		let { productId } = req.params
 		const { type } = req.query
-		if (type === 'cart') {
+		if (type === 'array') {
 			const ids = productId.split(',')
 			productId = ids.map(item => item)
 		}

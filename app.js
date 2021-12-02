@@ -13,6 +13,7 @@ import passportConfig from './passport'
 import userRouter from './router/user'
 import productRouter from './router/product'
 import cartRouter from './router/cart'
+import purchaseRouter from './router/purchase'
 
 const app = express()
 const port = 3000
@@ -43,6 +44,7 @@ const server = async () => {
 		app.use('/user', userRouter)
 		app.use('/product', productRouter)
 		app.use('/cart', cartRouter)
+		app.use('/purchase', purchaseRouter)
 		app.listen(port, () => console.log(`express 서버 시작 ${port}`))
 	} catch (error) {
 		console.error(error.message)
