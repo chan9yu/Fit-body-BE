@@ -12,6 +12,7 @@ import { MONGO_URI, COOKIE_SECRET } from './config'
 import passportConfig from './passport'
 import userRouter from './router/user'
 import productRouter from './router/product'
+import commentRouter from './router/comment'
 import cartRouter from './router/cart'
 import purchaseRouter from './router/purchase'
 
@@ -43,6 +44,7 @@ const server = async () => {
 		passportConfig()
 		app.use('/user', userRouter)
 		app.use('/product', productRouter)
+		app.use('/comment', commentRouter)
 		app.use('/cart', cartRouter)
 		app.use('/purchase', purchaseRouter)
 		app.listen(port, () => console.log(`express 서버 시작 ${port}`))

@@ -2,6 +2,7 @@ import express from 'express'
 import { isValidObjectId } from 'mongoose'
 import { isLoggedIn } from '../middleware/auth'
 import { User } from '../models/User'
+import { Product } from '../models/Product'
 
 const router = express.Router()
 
@@ -27,9 +28,11 @@ router.post('/:productId', isLoggedIn, async (req, res) => {
 		if (!isValidObjectId(productId))
 			return res.status(400).json({ message: '잘못된 상품 정보입니다.' })
 		const user = await User.findById(id)
+		const product = await Product.findById(productId)
+		const { title, description, price, images } = product
 		await User.findByIdAndUpdate(
 			id,
-			{ $push: { purchase: { item: productId } } },
+			{ $push: { purchase: { title, description, price, images } } },
 			{ new: true }
 		)
 		return res.status(200).json(user.purchase)
@@ -48,12 +51,16 @@ router.patch('/', isLoggedIn, async (req, res) => {
 		const cartItems = user.cart.map(v => v.id)
 		if (user.cart.length === 0)
 			return res.status(400).json({ message: '장바구니가 비어있습니다.' })
-		// 구매목록 저장
-		await User.findByIdAndUpdate(
-			id,
-			{ $push: { purchase: { item: cartItems } } },
-			{ new: true }
-		)
+		for (let i = 0; i < cartItems.length; i += 1) {
+			const product = await Product.findById(cartItems[i])
+			const { title, description, price, images } = product
+			// 구매목록 저장
+			await User.findByIdAndUpdate(
+				id,
+				{ $push: { purchase: { title, description, price, images } } },
+				{ new: true }
+			)
+		}
 		// 장바구니 비우기
 		await User.findByIdAndUpdate(id, { $set: { cart: [] } }, { new: true })
 		return res.status(200).json(user.purchase)
