@@ -5,6 +5,7 @@ import path from 'path'
 
 import { isLoggedIn } from '../middleware/auth'
 import { Product } from '../models/Product'
+import { User } from '../models/User'
 
 const router = express.Router()
 
@@ -37,6 +38,10 @@ router.post('/images', (req, res) => {
 // POST /product
 // 상품 등록 API
 router.post('/', isLoggedIn, async (req, res) => {
+	const { id } = req.user
+	const user = await User.findById(id)
+	if (user.role === 0)
+		return res.status(400).json({ message: '권한이 없습니다.' })
 	try {
 		const { images, title, description, price, categorys, subCategorys } =
 			req.body

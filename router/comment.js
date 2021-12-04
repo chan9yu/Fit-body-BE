@@ -14,8 +14,22 @@ router.get('/:productId', async (req, res) => {
 		const { productId } = req.params
 		if (!isValidObjectId(productId))
 			return res.status(400).json({ message: '존재하지 않는 상품입니다.' })
-		const comment = await Comment.find({ product: productId })
-		return res.status(200).json(comment)
+		const comments = await Comment.find({ product: productId })
+		let datas = []
+		async function asyncForEach(array) {
+			for (let i = 0; i < array.length; i += 1) {
+				const data = {
+					_id: array[i]._id,
+					content: array[i].content,
+					createdAt: array[i].createdAt
+				}
+				const user = await User.findById(array[i].user)
+				data.user = user.name
+				datas.unshift(data)
+			}
+		}
+		await asyncForEach(comments)
+		return res.status(200).json(datas)
 	} catch (error) {
 		console.error(error.message)
 		return res.status(500).json(error)
@@ -51,11 +65,11 @@ router.delete('/:commentId', isLoggedIn, async (req, res) => {
 		if (!isValidObjectId(commentId))
 			return res.status(400).json({ message: '존재하지 않는 상품입니다.' })
 		const comment = await Comment.findById(commentId)
-		if (comment.user !== id)
+		if (comment.user.toString() !== id)
 			return res
 				.status(400)
 				.json({ message: '다른 유저의 댓글은 삭제할 수 없습니다.' })
-		await Comment.findByIdAndDelete(productId)
+		await Comment.findByIdAndDelete(commentId)
 		return res.status(200).json({ message: '삭제하였습니다.' })
 	} catch (error) {
 		console.error(error.message)
