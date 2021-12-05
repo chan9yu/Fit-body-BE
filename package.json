@@ -5,6 +5,7 @@
   "main": "app.js",
   "node": "16.13.0",
   "npm": "8.1.0",
+  "type": "module",
   "scripts": {
     "start": "node app.js",
     "dev": "npx nodemon --exec babel-node app.js"
