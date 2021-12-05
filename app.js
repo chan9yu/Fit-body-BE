@@ -36,7 +36,6 @@ app.use(passport.session())
 const server = async () => {
 	try {
 		await mongoose.connect(MONGO_URI)
-		console.log('mongoose 연결 성공!')
 		passportConfig()
 		app.use('/user', userRouter)
 		app.use('/product', productRouter)
