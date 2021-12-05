@@ -7,13 +7,13 @@ import passport from 'passport'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
 
-import { MONGO_URI, COOKIE_SECRET, ORIGIN } from './config'
-import passportConfig from './passport'
-import userRouter from './router/user'
-import productRouter from './router/product'
-import commentRouter from './router/comment'
-import cartRouter from './router/cart'
-import purchaseRouter from './router/purchase'
+import { MONGO_URI, COOKIE_SECRET, ORIGIN } from './config.js'
+import passportConfig from './passport.js'
+import userRouter from './router/user.js'
+import productRouter from './router/product.js'
+import commentRouter from './router/comment.js'
+import cartRouter from './router/cart.js'
+import purchaseRouter from './router/purchase.js'
 
 const app = express()
 const sessionOption = {

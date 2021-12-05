@@ -1,6 +1,6 @@
 import passport from 'passport'
 import local from './local'
-import { User } from '../models/User'
+import { User } from '../models/User.js'
 
 export default () => {
 	passport.serializeUser((user, done) => {

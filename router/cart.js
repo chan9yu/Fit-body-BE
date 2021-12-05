@@ -1,8 +1,7 @@
 import express from 'express'
 import { isValidObjectId } from 'mongoose'
-
-import { isLoggedIn } from '../middleware/auth'
-import { User } from '../models/User'
+import { isLoggedIn } from '../middleware/auth.js'
+import { User } from '../models/User.js'
 
 const router = express.Router()
 

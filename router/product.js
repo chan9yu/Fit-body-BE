@@ -1,11 +1,9 @@
 import express from 'express'
-import { isValidObjectId } from 'mongoose'
 import multer from 'multer'
 import path from 'path'
-
-import { isLoggedIn } from '../middleware/auth'
-import { Product } from '../models/Product'
-import { User } from '../models/User'
+import { isLoggedIn } from '../middleware/auth.js'
+import { Product } from '../models/Product.js'
+import { User } from '../models/User.js'
 
 const router = express.Router()
 
