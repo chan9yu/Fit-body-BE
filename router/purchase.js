@@ -1,5 +1,5 @@
 import express from 'express'
-import { isValidObjectId } from 'mongoose'
+import mongoose from 'mongoose'
 import { isLoggedIn } from '../middleware/auth.js'
 import { User } from '../models/User.js'
 import { Product } from '../models/Product.js'
@@ -25,7 +25,7 @@ router.post('/:productId', isLoggedIn, async (req, res) => {
 	try {
 		const { id } = req.user
 		const { productId } = req.params
-		if (!isValidObjectId(productId))
+		if (!mongoose.isValidObjectId(productId))
 			return res.status(400).json({ message: '잘못된 상품 정보입니다.' })
 		const user = await User.findById(id)
 		const product = await Product.findById(productId)

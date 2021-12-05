@@ -1,5 +1,5 @@
 import express from 'express'
-import { isValidObjectId } from 'mongoose'
+import mongoose from 'mongoose'
 import { isLoggedIn } from '../middleware/auth.js'
 import { Comment } from '../models/Comment.js'
 import { Product } from '../models/Product.js'
@@ -12,7 +12,7 @@ const router = express.Router()
 router.get('/:productId', async (req, res) => {
 	try {
 		const { productId } = req.params
-		if (!isValidObjectId(productId))
+		if (!mongoose.isValidObjectId(productId))
 			return res.status(400).json({ message: '존재하지 않는 상품입니다.' })
 		const comments = await Comment.find({ product: productId })
 		let datas = []
@@ -43,7 +43,7 @@ router.post('/:productId', isLoggedIn, async (req, res) => {
 		const { id } = req.user
 		const { productId } = req.params
 		const { content } = req.body
-		if (!isValidObjectId(productId))
+		if (!mongoose.isValidObjectId(productId))
 			return res.status(400).json({ message: '존재하지 않는 상품입니다.' })
 		const user = await User.findById(id)
 		const product = await Product.findById(productId)
@@ -62,7 +62,7 @@ router.delete('/:commentId', isLoggedIn, async (req, res) => {
 	try {
 		const { id } = req.user
 		const { commentId } = req.params
-		if (!isValidObjectId(commentId))
+		if (!mongoose.isValidObjectId(commentId))
 			return res.status(400).json({ message: '존재하지 않는 상품입니다.' })
 		const comment = await Comment.findById(commentId)
 		if (comment.user.toString() !== id)
