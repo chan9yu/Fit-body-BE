@@ -7,7 +7,7 @@ import passport from 'passport'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
 
-import { MONGO_URI, COOKIE_SECRET, ORIGIN } from './config.js'
+import { MONGO_URI, COOKIE_SECRET, ORIGIN } from './config/index.js'
 import passportConfig from './passport.js'
 import userRouter from './router/user.js'
 import productRouter from './router/product.js'
