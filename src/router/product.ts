@@ -1,11 +1,9 @@
 import express from 'express'
-import { isValidObjectId } from 'mongoose'
 import multer from 'multer'
 import path from 'path'
-
 import { isLoggedIn } from '../middleware/auth'
-import { Product } from '../models/Product'
-import { User } from '../models/User'
+import Product from '../models/Product'
+import User from '../models/User'
 
 const router = express.Router()
 
@@ -21,7 +19,7 @@ const upload = multer({
 			done(null, basename + Date.now() + ext)
 		}
 	}),
-	limit: { fileSize: 20 * 1024 * 1024 }
+	limits: { fileSize: 20 * 1024 * 1024 }
 }).single('file')
 
 // POST /product/images
@@ -30,16 +28,17 @@ router.post('/images', (req, res) => {
 	upload(req, res, err => {
 		if (err) res.json({ success: false, err })
 		return res.json({
-			fileName: res.req.file.filename
+			fileName: res.req.file!.filename
 		})
 	})
 })
 
 // POST /product
 // 상품 등록 API
-router.post('/', isLoggedIn, async (req, res) => {
-	const { id } = req.user
+router.post('/', isLoggedIn, async (req: any, res) => {
+	const { id } = req.user!
 	const user = await User.findById(id)
+	if (!user) return res.status(400).json({ message: '유저 정보가 없습니다.' })
 	if (user.role === 0)
 		return res.status(400).json({ message: '권한이 없습니다.' })
 	try {
@@ -58,7 +57,7 @@ router.post('/', isLoggedIn, async (req, res) => {
 		const product = await Product.create(req.body)
 		await product.save()
 		return res.status(200).json({ message: '상품을 등록했습니다.' })
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
@@ -71,12 +70,13 @@ router.post('/products', async (req, res) => {
 	const limit = req.body.limit ? parseInt(req.body.limit) : 20
 	const { categorys, subCategorys } = req.body
 	try {
-		const products = await Product.find(categorys ? { categorys } : undefined)
-			.find(subCategorys ? { subCategorys } : undefined)
+		const products = await Product
+			.find(categorys ? { categorys } : {})
+			.find(subCategorys ? { subCategorys } : {})
 			.skip(skip)
 			.limit(limit)
 		return res.status(200).json({ products, postSize: products.length })
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
@@ -88,7 +88,7 @@ router.get('/with', async (req, res) => {
 	try {
 		const products = await Product.aggregate([{ $sample: { size: 4 } }])
 		return res.status(200).json({ products })
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
@@ -99,14 +99,16 @@ router.get('/with', async (req, res) => {
 router.get('/:productId', async (req, res) => {
 	try {
 		let { productId } = req.params
+		let productIdArray: string[] = []
 		const { type } = req.query
 		if (type === 'array') {
 			const ids = productId.split(',')
-			productId = ids.map(item => item)
+			productIdArray = ids.map(item => item)
 		}
 		// 해당 id의 상품 찾기
+		const dataId = type === 'array' ? productIdArray : productId
 		const products = await Product.find(
-			{ _id: { $in: productId } },
+			{ _id: { $in: dataId } },
 			{
 				categorys: 1,
 				description: 1,
@@ -117,7 +119,7 @@ router.get('/:productId', async (req, res) => {
 			}
 		).sort({ _id: -1 })
 		return res.status(200).send(products)
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}

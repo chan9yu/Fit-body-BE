@@ -1,16 +1,14 @@
 import passport from 'passport'
+import User from '../models/User'
 import local from './local'
-import { User } from '../models/User'
 
 export default () => {
-	passport.serializeUser((user, done) => {
+	passport.serializeUser((user: any, done) => {
 		done(null, user._id)
 	})
-
 	passport.deserializeUser(async (id, done) => {
 		try {
-			const user = await User.findById(id)
-			done(null, user)
+			done(null, await User.findById(id))
 		} catch (error) {
 			console.error(error)
 			done(error)

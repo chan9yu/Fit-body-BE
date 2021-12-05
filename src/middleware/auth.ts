@@ -1,4 +1,6 @@
-export const isLoggedIn = (req, res, next) => {
+import { NextFunction, Response } from 'express'
+
+const isLoggedIn = (req: any, res: Response, next: NextFunction) => {
 	if (req.isAuthenticated()) {
 		next()
 	} else {
@@ -6,7 +8,7 @@ export const isLoggedIn = (req, res, next) => {
 	}
 }
 
-export const isNotLoggedIn = (req, res, next) => {
+const isNotLoggedIn = (req: any, res: Response, next: NextFunction) => {
 	if (!req.isAuthenticated()) {
 		next()
 	} else {
@@ -15,3 +17,6 @@ export const isNotLoggedIn = (req, res, next) => {
 			.json({ message: '로그인 하지 않은 사용자만 접근 가능합니다!' })
 	}
 }
+
+export { isLoggedIn, isNotLoggedIn }
+

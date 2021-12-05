@@ -1,4 +1,15 @@
-import { Schema, model } from 'mongoose'
+import { Document, model, Schema } from 'mongoose'
+
+export interface UserTypes extends Document {
+	id?: string
+	name: string
+	email: string
+	password: string
+	role: number
+	cart: Array<any>
+	purchase: Array<any>
+}
+
 
 const userSchema = new Schema({
 	name: { type: String, maxlength: 50, required: true },
@@ -9,4 +20,4 @@ const userSchema = new Schema({
 	purchase: { type: Array, default: [] }
 })
 
-export const User = model('User', userSchema)
+export default model<UserTypes>('user', userSchema)
