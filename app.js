@@ -16,7 +16,6 @@ import cartRouter from './router/cart'
 import purchaseRouter from './router/purchase'
 
 const app = express()
-const PORT = process.env.PORT
 const sessionOption = {
 	saveUninitialized: false,
 	resave: false,
@@ -44,7 +43,9 @@ const server = async () => {
 		app.use('/comment', commentRouter)
 		app.use('/cart', cartRouter)
 		app.use('/purchase', purchaseRouter)
-		app.listen(PORT, () => console.log(`express 서버 시작 ${PORT}`))
+		app.listen(process.env.PORT || 3000, () =>
+			console.log(`express 서버 시작 ${process.env.PORT || 3000}`)
+		)
 	} catch (error) {
 		console.error(error.message)
 	}
