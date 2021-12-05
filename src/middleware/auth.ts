@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 
-const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
+const isLoggedIn = (req: any, res: Response, next: NextFunction) => {
 	if (req.isAuthenticated()) {
 		next()
 	} else {
@@ -8,7 +8,7 @@ const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
 	}
 }
 
-const isNotLoggedIn = (req: Request, res: Response, next: NextFunction) => {
+const isNotLoggedIn = (req: any, res: Response, next: NextFunction) => {
 	if (!req.isAuthenticated()) {
 		next()
 	} else {
@@ -19,3 +19,4 @@ const isNotLoggedIn = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export { isLoggedIn, isNotLoggedIn }
+

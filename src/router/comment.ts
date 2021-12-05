@@ -46,7 +46,7 @@ router.get('/:productId', async (req, res) => {
 
 // POST /comment/:productId
 // 댓글 등록 API
-router.post('/:productId', isLoggedIn, async (req, res) => {
+router.post('/:productId', isLoggedIn, async (req: any, res) => {
 	try {
 		const { id } = req.user!
 		const { productId } = req.params
@@ -66,7 +66,7 @@ router.post('/:productId', isLoggedIn, async (req, res) => {
 
 // DELETE /comment/:productId
 // 댓글 삭제 API
-router.delete('/:commentId', isLoggedIn, async (req, res) => {
+router.delete('/:commentId', isLoggedIn, async (req: any, res) => {
 	try {
 		const { id } = req.user!
 		const { commentId } = req.params

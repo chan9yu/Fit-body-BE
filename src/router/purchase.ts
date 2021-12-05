@@ -8,7 +8,7 @@ const router = express.Router()
 
 // GET /purchase
 // 구매 목록 정보 API
-router.get('/', isLoggedIn, async (req, res) => {
+router.get('/', isLoggedIn, async (req: any, res) => {
 	try {
 		const { id } = req.user!
 		const user = await User.findById(id)
@@ -21,7 +21,7 @@ router.get('/', isLoggedIn, async (req, res) => {
 
 // POST /purchase/:productId
 // 개별 상품 구매 API
-router.post('/:productId', isLoggedIn, async (req, res) => {
+router.post('/:productId', isLoggedIn, async (req: any, res) => {
 	try {
 		const { id } = req.user!
 		const { productId } = req.params
@@ -46,13 +46,13 @@ router.post('/:productId', isLoggedIn, async (req, res) => {
 
 // PATCH /purchase
 // 장바구니 상품 구매 API
-router.patch('/', isLoggedIn, async (req, res) => {
+router.patch('/', isLoggedIn, async (req: any, res) => {
 	try {
 		const { id } = req.user!
 		const user = await User.findById(id)
 		if (!user) return res.status(400).json({ message: '유저 정보가 없습니다.' })
-		const cartItems = user.cart.map(v => v.id)
-		if (user.cart.length === 0)
+		const cartItems = user.cart!.map(v => v.id)
+		if (user.cart!.length === 0)
 			return res.status(400).json({ message: '장바구니가 비어있습니다.' })
 		for (let i = 0; i < cartItems.length; i += 1) {
 			const product = await Product.findById(cartItems[i])

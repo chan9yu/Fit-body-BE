@@ -7,9 +7,9 @@ const router = express.Router()
 
 // GET /cart
 // 장바구니 정보 API
-router.get('/', isLoggedIn, async (req, res) => {
+router.get('/', isLoggedIn, async (req: any, res) => {
 	try {
-		const { id } = req.user!
+		const id = req.user!.id
 		const user = await User.findById(id)
 		if (!user)
 			return res.status(400).json({ message: '잘못된 유저 정보입니다.' })
@@ -22,9 +22,9 @@ router.get('/', isLoggedIn, async (req, res) => {
 
 // PATCH /cart/:productId
 // 장바구니 담기 API
-router.patch('/:productId', isLoggedIn, async (req, res) => {
+router.patch('/:productId', isLoggedIn, async (req: any, res) => {
 	try {
-		const id = req.user?.id
+		const { id } = req.user!
 		const { productId } = req.params
 		if (!isValidObjectId(productId))
 			return res.status(400).json({ message: '잘못된 상품 정보입니다.' })
@@ -32,7 +32,7 @@ router.patch('/:productId', isLoggedIn, async (req, res) => {
 		// 상품 중복 검사
 		let overlap = false
 		if (!user) return res.status(400).json({ message: '유저 정보가 없습니다.' })
-		user.cart.forEach(item => {
+		user.cart!.forEach(item => {
 			if (item.id === productId) overlap = true
 		})
 		// 이미 같은 상품이 있을 때 분기처리
@@ -59,7 +59,7 @@ router.patch('/:productId', isLoggedIn, async (req, res) => {
 
 // DELETE /cart/:productId
 // 장바구니 삭제 API
-router.delete('/:productId', isLoggedIn, async (req, res) => {
+router.delete('/:productId', isLoggedIn, async (req: any, res) => {
 	try {
 		const { id } = req.user!
 		const { productId } = req.params

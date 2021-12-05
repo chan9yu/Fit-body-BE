@@ -8,8 +8,7 @@ export default () => {
 	})
 	passport.deserializeUser(async (id, done) => {
 		try {
-			const user = await User.findById(id)
-			done(null, user)
+			done(null, await User.findById(id))
 		} catch (error) {
 			console.error(error)
 			done(error)

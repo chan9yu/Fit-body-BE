@@ -35,7 +35,7 @@ router.post('/images', (req, res) => {
 
 // POST /product
 // 상품 등록 API
-router.post('/', isLoggedIn, async (req, res) => {
+router.post('/', isLoggedIn, async (req: any, res) => {
 	const { id } = req.user!
 	const user = await User.findById(id)
 	if (!user) return res.status(400).json({ message: '유저 정보가 없습니다.' })
@@ -70,8 +70,9 @@ router.post('/products', async (req, res) => {
 	const limit = req.body.limit ? parseInt(req.body.limit) : 20
 	const { categorys, subCategorys } = req.body
 	try {
-		const products = await Product.find(categorys ? { categorys } : [])
-			.find(subCategorys ? { subCategorys } : [])
+		const products = await Product
+			.find(categorys ? { categorys } : {})
+			.find(subCategorys ? { subCategorys } : {})
 			.skip(skip)
 			.limit(limit)
 		return res.status(200).json({ products, postSize: products.length })
@@ -107,7 +108,7 @@ router.get('/:productId', async (req, res) => {
 		// 해당 id의 상품 찾기
 		const dataId = type === 'array' ? productIdArray : productId
 		const products = await Product.find(
-			{ _id: { $in: productId } },
+			{ _id: { $in: dataId } },
 			{
 				categorys: 1,
 				description: 1,

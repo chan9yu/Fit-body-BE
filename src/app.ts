@@ -24,11 +24,11 @@ const sessionOption = {
 	cookie: {
 		httpOnly: true,
 		secure: false, // https -> true
-		domain: prod ? '.nodebird.com' : undefined
+		domain: prod ? ORIGIN : undefined
 	}
 }
 
-app.set('port', prod ? process.env.ROPT : 5000)
+app.set('port', prod ? process.env.ROPT : 3000)
 
 if (prod) {
 	app.use(hpp())

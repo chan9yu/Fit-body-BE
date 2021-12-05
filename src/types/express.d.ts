@@ -1,9 +1,7 @@
-export {}
+import { UserTypes } from "../models/User";
 
 declare global {
 	namespace Express {
-		interface User {
-			id: any
-		}
+		interface User extends UserTypes {}
 	}
 }

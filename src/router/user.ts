@@ -8,7 +8,7 @@ const router = express.Router()
 
 // GET /user
 // 유저정보 API
-router.get('/', async (req, res) => {
+router.get('/', async (req: any, res) => {
 	try {
 		if (req.user) {
 			const { id } = req.user!
@@ -38,7 +38,8 @@ router.post('/signup', isNotLoggedIn, async (req, res) => {
 				.status(400)
 				.json({ message: '비밀번호는 5자리 이상이여야 합니다.' })
 		const hashedPassword = await bcrypt.hash(password, 12)
-		const newUser = await User.create({ email, name, password: hashedPassword })
+		const data = { email, name, password: hashedPassword }
+		const newUser = await User.create(data)
 		await newUser.save()
 		return res.status(200).json({ message: '회원가입에 성공했습니다.' })
 	} catch (error: any) {
@@ -62,7 +63,7 @@ router.post('/login', isNotLoggedIn, (req, res) => {
 
 // POST /user/logout
 // 로그아웃 API
-router.get('/logout', isLoggedIn, (req, res) => {
+router.get('/logout', isLoggedIn, (req: any, res) => {
 	req.logout()
 	req.session!.destroy(() => {
 		return res.status(200).json({ message: '로그아웃 되었습니다.' })

@@ -1,16 +1,14 @@
 import { Document, model, Schema } from 'mongoose'
 
-interface ProductTypes {
+interface ProductTypes extends Document {
 	title: string
 	description: string
 	price: number
-	images: any
+	images: Array<any>
 	sold: number
 	categorys: string
 	subCategorys: string
 }
-
-export interface ProductTypesModel extends ProductTypes, Document {}
 
 const productSchema = new Schema(
 	{
@@ -25,4 +23,4 @@ const productSchema = new Schema(
 	{ timestamps: true }
 )
 
-export default model<ProductTypesModel>('Product', productSchema)
+export default model<ProductTypes>('Product', productSchema)

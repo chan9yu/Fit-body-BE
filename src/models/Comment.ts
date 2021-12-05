@@ -1,12 +1,10 @@
 import { Document, model, Schema, Types } from 'mongoose'
 
-interface CommentTypes {
+interface CommentTypes extends Document {
 	content: string
-	user: any
-	product: any
+	user: Types.ObjectId
+	product: Types.ObjectId
 }
-
-export interface CommentTypesModel extends CommentTypes, Document {}
 
 const commentSchema = new Schema(
 	{
@@ -17,4 +15,4 @@ const commentSchema = new Schema(
 	{ timestamps: true }
 )
 
-export default model<CommentTypesModel>('comment', commentSchema)
+export default model<CommentTypes>('comment', commentSchema)
