@@ -1,8 +1,7 @@
 import express from 'express'
 import { isValidObjectId } from 'mongoose'
-
 import { isLoggedIn } from '../middleware/auth'
-import { User } from '../models/User'
+import User from '../models/User'
 
 const router = express.Router()
 
@@ -10,11 +9,12 @@ const router = express.Router()
 // 장바구니 정보 API
 router.get('/', isLoggedIn, async (req, res) => {
 	try {
-		const { id } = req.user
+		const { id } = req.user!
 		const user = await User.findById(id)
-		const { cart } = user
-		return res.status(200).json(cart)
-	} catch (error) {
+		if (!user)
+			return res.status(400).json({ message: '잘못된 유저 정보입니다.' })
+		return res.status(200).json(user.cart)
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
@@ -24,13 +24,14 @@ router.get('/', isLoggedIn, async (req, res) => {
 // 장바구니 담기 API
 router.patch('/:productId', isLoggedIn, async (req, res) => {
 	try {
-		const { id } = req.user
+		const id = req.user?.id
 		const { productId } = req.params
 		if (!isValidObjectId(productId))
 			return res.status(400).json({ message: '잘못된 상품 정보입니다.' })
 		const user = await User.findById(id)
 		// 상품 중복 검사
 		let overlap = false
+		if (!user) return res.status(400).json({ message: '유저 정보가 없습니다.' })
 		user.cart.forEach(item => {
 			if (item.id === productId) overlap = true
 		})
@@ -50,7 +51,7 @@ router.patch('/:productId', isLoggedIn, async (req, res) => {
 			)
 			return res.status(200).send(user.cart)
 		}
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
@@ -60,7 +61,7 @@ router.patch('/:productId', isLoggedIn, async (req, res) => {
 // 장바구니 삭제 API
 router.delete('/:productId', isLoggedIn, async (req, res) => {
 	try {
-		const { id } = req.user
+		const { id } = req.user!
 		const { productId } = req.params
 		if (!isValidObjectId(productId))
 			return res.status(400).json({ message: '잘못된 상품 정보입니다.' })
@@ -71,7 +72,7 @@ router.delete('/:productId', isLoggedIn, async (req, res) => {
 			{ new: true }
 		)
 		return res.status(200).json(user.cart)
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}

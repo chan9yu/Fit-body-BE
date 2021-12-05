@@ -1,9 +1,8 @@
-import express from 'express'
 import bcrypt from 'bcrypt'
+import express from 'express'
 import passport from 'passport'
-
 import { isLoggedIn, isNotLoggedIn } from '../middleware/auth'
-import { User } from '../models/User'
+import User from '../models/User'
 
 const router = express.Router()
 
@@ -12,12 +11,13 @@ const router = express.Router()
 router.get('/', async (req, res) => {
 	try {
 		if (req.user) {
-			const user = await User.findById(req.user.id)
+			const { id } = req.user!
+			const user = await User.findById(id)
 			return res.status(200).json(user)
 		} else {
 			return res.status(200).json(null)
 		}
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
@@ -41,7 +41,7 @@ router.post('/signup', isNotLoggedIn, async (req, res) => {
 		const newUser = await User.create({ email, name, password: hashedPassword })
 		await newUser.save()
 		return res.status(200).json({ message: '회원가입에 성공했습니다.' })
-	} catch (error) {
+	} catch (error: any) {
 		console.error(error.message)
 		return res.status(500).json(error)
 	}
@@ -51,8 +51,8 @@ router.post('/signup', isNotLoggedIn, async (req, res) => {
 // 로그인 API
 router.post('/login', isNotLoggedIn, (req, res) => {
 	passport.authenticate('local', (err, user, info) => {
-		if (err) return res.status(500).json({ message: err }) // server error
-		if (info) return res.status(400).json({ message: info }) // client error
+		if (err) return res.status(500).json(err) // server error
+		if (info) return res.status(400).json(info) // client error
 		return req.login(user, loginErr => {
 			if (loginErr) return res.status(500).json(loginErr) // passport error
 			return res.status(200).json(user) // login success
@@ -64,8 +64,9 @@ router.post('/login', isNotLoggedIn, (req, res) => {
 // 로그아웃 API
 router.get('/logout', isLoggedIn, (req, res) => {
 	req.logout()
-	req.session.destroy()
-	return res.status(200).json({ message: '로그아웃 되었습니다.' })
+	req.session!.destroy(() => {
+		return res.status(200).json({ message: '로그아웃 되었습니다.' })
+	})
 })
 
 export default router
