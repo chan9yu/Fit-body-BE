@@ -4,11 +4,10 @@ import hpp from 'hpp'
 import helmet from 'helmet'
 import mongoose from 'mongoose'
 import passport from 'passport'
-import morgan from 'morgan'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
 
-import { MONGO_URI, COOKIE_SECRET } from './config'
+import { MONGO_URI, COOKIE_SECRET, ORIGIN } from './config'
 import passportConfig from './passport'
 import userRouter from './router/user'
 import productRouter from './router/product'
@@ -17,8 +16,7 @@ import cartRouter from './router/cart'
 import purchaseRouter from './router/purchase'
 
 const app = express()
-const port = 3000
-const origin = 'http://localhost:8080'
+const PORT = process.env.PORT
 const sessionOption = {
 	saveUninitialized: false,
 	resave: false,
@@ -27,8 +25,7 @@ const sessionOption = {
 
 app.use(hpp())
 app.use(helmet())
-app.use(morgan('dev'))
-app.use(cors({ origin, credentials: true }))
+app.use(cors({ origin: ORIGIN, credentials: true }))
 app.use('/', express.static('uploads'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -47,7 +44,7 @@ const server = async () => {
 		app.use('/comment', commentRouter)
 		app.use('/cart', cartRouter)
 		app.use('/purchase', purchaseRouter)
-		app.listen(port, () => console.log(`express 서버 시작 ${port}`))
+		app.listen(PORT, () => console.log(`express 서버 시작 ${PORT}`))
 	} catch (error) {
 		console.error(error.message)
 	}
