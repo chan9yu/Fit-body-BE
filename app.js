@@ -24,7 +24,7 @@ const sessionOption = {
 		httpOnly: true,
 		secure: false,
 		sameSite: 'none',
-		domain: 'bodyfit-app.herokuapp.com',
+		domain: 'bodyfit-server.herokuapp.com/',
 		path: '/'
 	}
 }
