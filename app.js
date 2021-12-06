@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import passport from 'passport'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
+import cookieSession from 'cookie-session'
 
 import { MONGO_URI, COOKIE_SECRET, ORIGIN } from './config/index.js'
 import passportConfig from './passport/index.js'
@@ -21,11 +22,7 @@ const sessionOption = {
 	exposedHeaders: ['sessionId'],
 	secret: COOKIE_SECRET,
 	resave: false,
-	saveUninitialized: false,
-	cookie: {
-		sameSite: 'none',
-		maxAge: 1000 * 60 * 60 * 60
-	}
+	saveUninitialized: false
 }
 
 app.use(hpp())
@@ -35,6 +32,16 @@ app.use('/', express.static('uploads'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser(COOKIE_SECRET))
+app.use(
+	cookieSession({
+		name: '__session',
+		keys: ['key1'],
+		maxAge: 24 * 60 * 60 * 100,
+		secure: true,
+		httpOnly: true,
+		sameSite: 'none'
+	})
+)
 app.use(session(sessionOption))
 app.use(passport.initialize())
 app.use(passport.session())
