@@ -6,7 +6,6 @@ import mongoose from 'mongoose'
 import passport from 'passport'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
-import cookieSession from 'cookie-session'
 
 import { MONGO_URI, COOKIE_SECRET, ORIGIN } from './config/index.js'
 import passportConfig from './passport/index.js'
@@ -22,8 +21,9 @@ const sessionOption = {
 	resave: false,
 	saveUninitialized: false,
 	cookie: {
-		SameSite: 'none',
-		maxAge: 1000 * 60 * 60 * 60
+		secure: true,
+		SameSite: 'None',
+		sameSite: 1000 * 60 * 60 * 60
 	}
 }
 
