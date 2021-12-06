@@ -19,7 +19,11 @@ const app = express()
 const sessionOption = {
 	saveUninitialized: false,
 	resave: false,
-	secret: COOKIE_SECRET
+	secret: COOKIE_SECRET,
+	cookie: {
+		secure: true,
+		sameSite: 'None'
+	}
 }
 
 app.use(hpp())
