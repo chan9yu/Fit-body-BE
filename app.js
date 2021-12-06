@@ -17,12 +17,14 @@ import purchaseRouter from './router/purchase.js'
 
 const app = express()
 const sessionOption = {
-	saveUninitialized: false,
-	resave: false,
+	allowedHeaders: ['sessionId', 'Content-Type'],
+	exposedHeaders: ['sessionId'],
 	secret: COOKIE_SECRET,
+	resave: false,
+	saveUninitialized: false,
 	cookie: {
-		secure: true,
-		sameSite: 'None'
+		SameSite: 'none',
+		maxAge: 1000 * 60 * 60 * 60
 	}
 }
 
