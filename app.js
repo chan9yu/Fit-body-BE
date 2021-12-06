@@ -22,8 +22,7 @@ const sessionOption = {
 	saveUninitialized: false,
 	cookie: {
 		secure: true,
-		SameSite: 'None',
-		sameSite: 1000 * 60 * 60 * 60
+		SameSite: 'None'
 	}
 }
 
