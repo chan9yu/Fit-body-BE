@@ -24,8 +24,7 @@ const sessionOption = {
 		httpOnly: true,
 		secure: false,
 		sameSite: 'none',
-		domain:
-			process.env.NODE_ENV === 'production' && '.bodyfit-app.herokuapp.com'
+		domain: process.env.NODE_ENV === 'production' && '.herokuapp.com'
 	}
 }
 
