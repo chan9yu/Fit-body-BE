@@ -23,7 +23,7 @@ const sessionOption = {
 	resave: false,
 	saveUninitialized: false,
 	cookie: {
-		SameSite: 'none',
+		sameSite: 'none',
 		maxAge: 1000 * 60 * 60 * 60
 	}
 }
