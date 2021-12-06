@@ -18,11 +18,13 @@ import purchaseRouter from './router/purchase.js'
 
 const app = express()
 const sessionOption = {
-	allowedHeaders: ['sessionId', 'Content-Type'],
-	exposedHeaders: ['sessionId'],
 	secret: COOKIE_SECRET,
 	resave: false,
-	saveUninitialized: false
+	saveUninitialized: false,
+	cookie: {
+		SameSite: 'none',
+		maxAge: 1000 * 60 * 60 * 60
+	}
 }
 
 app.use(hpp())
@@ -32,16 +34,6 @@ app.use('/', express.static('uploads'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser(COOKIE_SECRET))
-app.use(
-	cookieSession({
-		name: '__session',
-		keys: ['key1'],
-		maxAge: 24 * 60 * 60 * 100,
-		secure: true,
-		httpOnly: true,
-		sameSite: 'none'
-	})
-)
 app.use(session(sessionOption))
 app.use(passport.initialize())
 app.use(passport.session())
