@@ -24,9 +24,12 @@ const sessionOption = {
 		httpOnly: true,
 		secure: false,
 		sameSite: 'none',
-		domain: process.env.NODE_ENV === 'production' && '.herokuapp.com'
+		domain: 'bodyfit-app.herokuapp.com',
+		path: '/'
 	}
 }
+
+app.set('trust proxy', 1)
 
 app.use(hpp())
 app.use(helmet())
