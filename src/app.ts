@@ -23,12 +23,14 @@ const sessionOption = {
 	secret: process.env.COOKIE_SECRET!,
 	cookie: {
 		httpOnly: true,
-		secure: false, // https -> true
-		domain: prod ? ORIGIN : undefined
+		secure: false,
+		sameSite: 'none' as const,
+		domain: 'bodyfit-server.herokuapp.com/',
+		path: '/'
 	}
 }
 
-app.set('port', prod ? process.env.ROPT : 3000)
+app.set('port', prod ? process.env.PORT : 3000)
 
 if (prod) {
 	app.use(hpp())
